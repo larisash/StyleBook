@@ -49,3 +49,26 @@ span.right {
   text-align: center;
   padding: 1px;
 }
+
+
+
+/*overright css  */
+
+.media-object {
+    display: block;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+div.post-box {
+    border: 1px solid lightgray;
+    margin-bottom: 15px;
+    padding-top: 15px;
+    padding-left: 15px;
+    width: 60%;
+}
+  .row {
+    margin-right: -15px;
+    margin-left: -15px;
+    padding-right: 15px;
+}

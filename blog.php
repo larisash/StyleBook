@@ -8,13 +8,41 @@ if( ! verify_user() ){
   exit;
 }
 
+if(isset($_REQUEST['like'])) {
+  $isLike = $_REQUEST['like'] || NULL;
+  $isUnLike = $_REQUEST['unlike'] || NULL;
+}
+
+
+if (isset($_REQUEST['like'])) {
+  $postId = intval($_REQUEST['postid']);
+  $sql = "UPDATE posts SET likes = likes + 1 WHERE posts.id=$postId";
+  $link = mysqli_connect('localhost', 'root', '', 'fakebook');
+  $result = mysqli_query($link, $sql);
+}
+
+// if (isset($isUnLike)) until when?!!!! {
+
+// }
+
+$likeNoneOrBlock = 'block';
+$unlikeNoneOrBlock = 'none';
+
+function showUnlike(){
+  $likeNoneOrBlock = 'none';
+  $unlikeNoneOrBlock = 'block';
+}
+function showLike(){
+  $likeNoneOrBlock = 'block';
+  $unlikeNoneOrBlock = 'none';
+}
 $title = 'StyleBook blog page';
 $uid = $_SESSION['user_id'];
 $posts = [];
 $link = mysqli_connect('localhost', 'root', '', 'fakebook');
 mysqli_query($link, "SET NAMES utf8");
 
-$sql = "SELECT u.name,p.id,p.user_id,p.title,p.article,DATE_FORMAT(p.date,'%d/%m/%Y') date FROM posts p "
+$sql = "SELECT u.name,u.avatar, p.likes, p.id,p.user_id,p.title,p.article,DATE_FORMAT(p.date,'%d/%m/%Y') date FROM posts p "
         . " JOIN users u ON u.id = p.user_id "
         . " ORDER BY p.date DESC";
 
@@ -37,42 +65,67 @@ if( $result && mysqli_num_rows($result) > 0 ){
         <div class="post-box">
          
          
-         <?
-            $id = $post['user_id'];
-            $mysql = "SELECT avatar FROM `users` WHERE id=$id";
-            $link = mysqli_connect('localhost', 'root', '', 'fakebook')
-            $imgRes = mysqli_query($link, $mysql);
+         <?php
+         #what the fuck php why u dont bring the avatar pic?!!!
+          #  $id = $post['user_id'];
+           # $mysql = "SELECT avatar FROM `users` WHERE id=$id";
+           # $link = mysqli_connect('localhost', 'root', '', 'fakebook');
+           # global $imgRes ;
+           # $imgRes = mysqli_query($link, $mysql);
          ?>
 
-          <h3><?= htmlentities($post['title']);?></h3>
-          <img class="media-object" src="/images/<?php echo $imgRes ?>" />
-          <p><?= htmlentities($post['article']); ?></p>
-          <hr>
-          <p>
-            Written by: <i><?= htmlentities($post['name']); ?></i> , On date: <?= $post['date']; ?>
-            <?php if( $uid == $post['user_id'] ): ?> 
-            <span class="right">
-              <a href="update_post.php?pid=<?= $post['id']; ?>">Edit</a> | 
-              <a href="delete_post.php?pid=<?= $post['id']; ?>">Delete</a>
-            </span>
-            <?php endif; ?>
-          </p>
+          <div class="media">
+            <div class="media-left">
+              <a href="#">
+                <img class="media-object" src="./images/<?= $post['avatar'] ?>" alt="..."> 
+              </a>
+            </div>
+            <div class="media-body">
+              <h4 class="media-heading"><?= htmlentities($post['title']);?></h4>
+              <?= htmlentities($post['article']); ?>
+              <p>
+              <div class="row">
+              <span> 
+                  <b>Written by:</b>  <i><?= htmlentities($post['name']); ?></i> &nbsp  <b>On date: </b> <?= $post['date']; ?>
+
+                  <a href="blog.php?like=true?unlike=false?postid=<?= $post['id']?>" style="display:<?= $likeNoneOrBlock ?>"> <button type="button" id="like"  class="btn btn-info">LIKE</button></a>
+                   <a href="blog.php?like=false?unlike=true" style="display:<?= $unlikeNoneOrBlock  ?>"><button type="button" id="unlike"   class="btn btn-info">UNLIKE</button> </a>
+                   <p> likes <?=$post['likes']; ?></p>
+              </span>
+                <?php if( $uid == $post['user_id'] ): ?> 
+                <span class="right">
+                  <a href="update_post.php?pid=<?= $post['id']; ?>"><button type="button" class="btn btn-warning">EDIT</button></a> | 
+                  <a href="delete_post.php?pid=<?= $post['id']; ?>"><button type="button" class="btn btn-danger">DELETE</button></a>
+                </span>
+                <?php endif; ?>
+              
+              </div>
+              </p>
+            </div>
+          </div>
         </div>
       <?php endforeach; ?>
     <?php endif; ?>
-  </div> 
-<div class="media">
-  <div class="media-left">
-    <a href="#">
-      <!-- <img class="media-object" src="./images/<? $img ?>" alt="..."> -->
-    </a>
-  </div>
-  <div class="media-body">
-    <h4 class="media-heading">Media heading</h4>
-    ...
-  </div>
-</div>
+ 
 
 
-  
+<script>
+
+// $(document).ready(function(){
+//   $('#like').show();
+//   $('#unlike').hide();
+// });
+
+  $('#like').click(function(e) {
+     $('#like').hide();
+     $('#unlike').show();
+      console.log(e);
+  });
+  $('#unlike').click(function(e) {
+    console.log('unlike')
+    $('#like').show();
+    $('#unlike').hide();
+  });
+</script>
+
 <?php include 'tpl/footer.php'; ?>
